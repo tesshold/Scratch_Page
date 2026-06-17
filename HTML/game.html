@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Captain of the Nephite Host</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #0d0a04 0%, #1a1208 50%, #2d200a 100%);
+      color: #e8d5a0;
+    }
+
+    /* ── Screens ── */
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; flex-direction: column; }
+
+    /* ── Stars ── */
+    #stars-container {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .star {
+      position: absolute; border-radius: 50%; background: #fffde7;
+    }
+
+    /* ══════════════════ START SCREEN ══════════════════ */
+    #screen-start {
+      align-items: center; justify-content: center;
+      padding: 2rem 1rem;
+      background: linear-gradient(180deg, #0d0a04 0%, #1a1208 50%, #2d200a 100%);
+      position: relative;
+    }
+
+    .banner-pole {
+      width: 3px; height: 60px;
+      background: #92400e; margin: 0 auto;
+    }
+    .banner-pole-short { width: 3px; height: 30px; background: #92400e; margin: 0 auto; }
+
+    .banner-flag {
+      background: #7f1d1d;
+      border: 4px solid #d97706;
+      padding: 1.25rem 2.5rem;
+      clip-path: polygon(0 0,100% 0,93% 50%,100% 100%,0 100%,7% 50%);
+      text-align: center;
+    }
+    .banner-flag .subtitle { color: #fbbf24; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.25rem; }
+    .banner-flag .title   { color: #fef3c7; font-size: 1.75rem; font-weight: bold; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .start-card {
+      position: relative; z-index: 1;
+      background: rgba(28, 20, 4, 0.92);
+      border: 2px solid #78350f;
+      border-radius: 0.75rem;
+      padding: 2rem;
+      max-width: 480px; width: 100%;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+      margin-top: 1rem;
+    }
+    .start-year { color: #d97706; font-size: 0.7rem; text-align: center; font-style: italic; margin-bottom: 0.25rem; }
+    .start-blurb { color: #fef3c7; font-size: 0.85rem; line-height: 1.6; text-align: center; margin-bottom: 1.25rem; }
+    .start-blurb strong { color: #f5f5f5; }
+
+    .rule-grid { display: flex; justify-content: center; gap: 2rem; margin-bottom: 1.25rem; font-size: 0.75rem; text-align: center; }
+    .rule-correct .rule-icon { color: #4ade80; font-size: 1.25rem; }
+    .rule-correct .rule-label { color: #4ade80; font-weight: bold; }
+    .rule-correct .rule-sub   { color: #166534; }
+    .rule-wrong .rule-icon  { color: #f87171; font-size: 1.25rem; }
+    .rule-wrong .rule-label { color: #f87171; font-weight: bold; }
+    .rule-wrong .rule-sub   { color: #7f1d1d; }
+    .rule-divider { color: #78350f; font-size: 1.25rem; align-self: center; }
+
+    .rule-note { color: #92400e; font-size: 0.7rem; text-align: center; font-style: italic; margin-bottom: 1.25rem; }
+
+    .start-label { color: #fbbf24; font-size: 0.85rem; display: block; margin-bottom: 0.5rem; }
+    .start-input {
+      width: 100%;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid #78350f;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      color: #fef3c7;
+      font-family: Georgia, serif;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .start-input:focus { border-color: #fbbf24; }
+
+    .btn-primary {
+      width: 100%;
+      background: #7f1d1d;
+      border: 2px solid #d97706;
+      border-radius: 0.5rem;
+      color: #fef3c7;
+      font-family: Georgia, serif;
+      font-size: 0.85rem;
+      font-weight: bold;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: #991b1b; transform: scale(1.03); }
+    .btn-primary:disabled { background: #1f2937; color: #4b5563; cursor: not-allowed; transform: none; }
+
+    /* ══════════════════ GAME SCREEN ══════════════════ */
+    #screen-game { background: linear-gradient(180deg, #0d0a04 0%, #1a1208 50%, #2d200a 100%); }
+
+    .topbar {
+      background: rgba(0,0,0,0.6);
+      border-bottom: 1px solid #451a03;
+      padding: 0.5rem 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 0.5rem;
+    }
+    .topbar-captain { color: #fcd34d; font-weight: bold; font-size: 0.85rem; }
+    .topbar-battle  { color: #f59e0b; font-size: 0.85rem; }
+
+    .war-dots { display: flex; align-items: center; gap: 0.5rem; font-size: 0.7rem; }
+    .dot-group { display: flex; gap: 0.25rem; }
+    .dot {
+      width: 1.1rem; height: 1.1rem;
+      border-radius: 0.2rem;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 0.65rem;
+    }
+    .dot-n-on  { background: #15803d; color: #fff; }
+    .dot-n-off { background: #052e16; color: #052e16; border: 1px solid #052e16; }
+    .dot-l-on  { background: #991b1b; color: #fff; }
+    .dot-l-off { background: #1c0505; color: #1c0505; border: 1px solid #1c0505; }
+    .dot-vs    { color: #78350f; }
+
+    /* Scoreboard */
+    .scoreboard {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #451a03;
+      background: rgba(0,0,0,0.3);
+    }
+    .score-row {
+      display: flex; align-items: center; justify-content: center; gap: 1.5rem;
+      max-width: 500px; margin: 0 auto;
+    }
+    .score-side { display: flex; align-items: center; gap: 0.5rem; }
+    .score-num {
+      font-size: 1.75rem; font-weight: bold;
+      transition: color 0.3s;
+    }
+    .score-num-n-on  { color: #4ade80; }
+    .score-num-n-off { color: #052e16; }
+    .score-num-l-on  { color: #f87171; }
+    .score-num-l-off { color: #3b0000; }
+    .warriors { display: flex; gap: 0.25rem; }
+
+    .score-mid { text-align: center; }
+    .score-mid-label { color: #78350f; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    .score-mid-vs    { color: #f59e0b; font-size: 1.2rem; font-weight: bold; }
+    .score-mid-count { color: #78350f; font-size: 0.65rem; }
+
+    .score-labels { display: flex; justify-content: center; gap: 4rem; margin-top: 0.25rem; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; }
+    .label-n { color: #166534; }
+    .label-l { color: #7f1d1d; }
+
+    .hint { text-align: center; padding: 0.4rem; color: #92400e; font-size: 0.7rem; font-style: italic; }
+
+    /* Card columns */
+    .card-area {
+      flex: 1; display: flex; gap: 0.75rem;
+      padding: 0 1rem 1rem;
+      max-width: 720px; margin: 0 auto; width: 100%;
+    }
+    .card-col { flex: 1; display: flex; flex-direction: column; gap: 0.6rem; }
+    .col-header { color: #d97706; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; text-align: center; }
+
+    .card {
+      width: 100%; min-height: 90px;
+      border-radius: 0.75rem; border: 2px solid;
+      padding: 0.75rem 0.9rem;
+      font-family: Georgia, serif; font-size: 0.75rem; line-height: 1.5;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-align: left;
+    }
+    .card-ref { text-align: center; font-weight: bold; letter-spacing: 0.05em; }
+
+    .card-idle-script {
+      border-color: #451a03; background: rgba(28,14,2,0.6); color: #d97706;
+    }
+    .card-idle-script:hover { border-color: #b45309; }
+
+    .card-idle-ref {
+      border-color: #3b1200; background: rgba(20,10,2,0.3); color: #78350f; cursor: default;
+    }
+    .card-active-ref {
+      border-color: #92400e; background: rgba(28,14,2,0.5); color: #fde68a; cursor: pointer;
+    }
+    .card-active-ref:hover { border-color: #fcd34d; background: rgba(55,28,5,0.6); }
+
+    .card-selected {
+      border-color: #fcd34d; background: rgba(55,36,6,0.7); color: #fef3c7;
+      box-shadow: 0 0 16px rgba(252,211,77,0.2);
+    }
+    .card-correct {
+      border-color: #4ade80; background: rgba(5,46,22,0.4); color: #bbf7d0;
+    }
+    .card-wrong {
+      border-color: #f87171; background: rgba(50,5,5,0.4); color: #fecaca;
+    }
+    .card-matched {
+      opacity: 0; pointer-events: none; border-color: #1c0a00; background: transparent;
+    }
+
+    /* ══════════════════ POPUP ══════════════════ */
+    #popup-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.78);
+      z-index: 100; align-items: center; justify-content: center;
+    }
+    #popup-overlay.open { display: flex; }
+
+    .popup-box {
+      border: 4px solid; border-radius: 1rem;
+      padding: 2rem; max-width: 360px; width: 90%;
+      text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+    }
+    .popup-box.nephite { background: #052e16; border-color: #22c55e; }
+    .popup-box.lamanite { background: #1c0505; border-color: #ef4444; }
+
+    .popup-emoji   { font-size: 3rem; margin-bottom: 0.75rem; }
+    .popup-title   { font-size: 1.5rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem; }
+    .popup-title.nephite  { color: #86efac; }
+    .popup-title.lamanite { color: #fca5a5; }
+    .popup-round   { color: #fbbf24; font-size: 0.8rem; margin-bottom: 1.25rem; }
+
+    .popup-scores  { display: flex; justify-content: center; gap: 2.5rem; margin-bottom: 1.25rem; }
+    .popup-score-n { }
+    .popup-score-l { }
+    .ps-label-n    { color: #4ade80; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.25rem; }
+    .ps-label-l    { color: #f87171; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.25rem; }
+    .ps-num        { color: #fff; font-size: 2.5rem; font-weight: bold; }
+    .ps-sub-n      { color: #166534; font-size: 0.65rem; margin-top: 0.25rem; }
+    .ps-sub-l      { color: #7f1d1d; font-size: 0.65rem; margin-top: 0.25rem; }
+    .ps-vs         { color: #f59e0b; font-size: 1.25rem; align-self: center; }
+
+    .popup-msg { font-size: 0.8rem; margin-bottom: 1.25rem; }
+    .popup-msg.nephite  { color: #86efac; }
+    .popup-msg.lamanite { color: #fca5a5; }
+
+    .btn-popup {
+      width: 100%; border-radius: 0.5rem; border: 2px solid;
+      font-family: Georgia, serif; font-weight: bold;
+      font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 0.75rem 1.5rem; cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .btn-popup:hover { transform: scale(1.04); }
+    .btn-popup.nephite  { background: #166534; border-color: #4ade80; color: #dcfce7; }
+    .btn-popup.lamanite { background: #7f1d1d; border-color: #f87171; color: #fef3c7; }
+
+    /* ══════════════════ FINAL SCREEN ══════════════════ */
+    #screen-final {
+      align-items: center; justify-content: center;
+      padding: 2rem 1rem; text-align: center;
+    }
+    #screen-final.win  { background: linear-gradient(180deg,#081408 0%,#0f2810 60%); }
+    #screen-final.lose { background: linear-gradient(180deg,#140808 0%,#280e0e 60%); }
+
+    .final-emoji { font-size: 4rem; margin-bottom: 1rem; }
+    .final-title { font-size: 2.5rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+    .final-title.win  { color: #86efac; }
+    .final-title.lose { color: #fca5a5; }
+    .final-subtitle { font-size: 1.1rem; margin-bottom: 0.25rem; }
+    .final-subtitle.win  { color: #fef3c7; }
+    .final-subtitle.lose { color: #fca5a5; }
+    .final-captain { color: #d97706; font-size: 0.85rem; margin-bottom: 2rem; }
+
+    .final-card {
+      border: 2px solid; border-radius: 0.75rem; padding: 1.5rem;
+      max-width: 380px; width: 100%; margin-bottom: 1.5rem;
+    }
+    .final-card.win  { background: rgba(5,46,22,0.8); border-color: #166534; }
+    .final-card.lose { background: rgba(28,5,5,0.8); border-color: #7f1d1d; }
+
+    .final-card-title { color: #d97706; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem; }
+
+    .final-scores { display: flex; justify-content: center; gap: 2.5rem; margin-bottom: 1rem; }
+    .fs-n, .fs-l { }
+    .fs-label-n { color: #4ade80; font-size: 0.65rem; text-transform: uppercase; margin-bottom: 0.25rem; }
+    .fs-label-l { color: #f87171; font-size: 0.65rem; text-transform: uppercase; margin-bottom: 0.25rem; }
+    .fs-num     { color: #fff; font-size: 2.5rem; font-weight: bold; }
+    .fs-dots    { display: flex; justify-content: center; gap: 0.25rem; margin-top: 0.5rem; }
+    .fs-dot     { width: 1rem; height: 1rem; border-radius: 50%; }
+    .fs-dot-n-on  { background: #4ade80; }
+    .fs-dot-n-off { background: #052e16; border: 1px solid #052e16; }
+    .fs-dot-l-on  { background: #f87171; }
+    .fs-dot-l-off { background: #1c0505; border: 1px solid #1c0505; }
+    .fs-vs      { color: #d97706; font-size: 1.25rem; align-self: center; }
+
+    .final-breakdown { border-top: 1px solid #451a03; padding-top: 0.75rem; margin-top: 0.5rem; }
+    .breakdown-row   { display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; padding: 0.25rem 0; flex-wrap: wrap; gap: 0.25rem; }
+    .br-label        { color: #92400e; }
+    .br-result-n     { color: #4ade80; font-weight: bold; }
+    .br-result-l     { color: #f87171; font-weight: bold; }
+    .br-stats        { color: #78350f; }
+
+    .btn-play-again {
+      border-radius: 0.5rem; border: 2px solid;
+      font-family: Georgia, serif; font-weight: bold;
+      font-size: 0.85rem; letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 0.75rem 2rem; cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .btn-play-again:hover { transform: scale(1.04); }
+    .btn-play-again.win  { background: #166534; border-color: #22c55e; color: #dcfce7; }
+    .btn-play-again.lose { background: #7f1d1d; border-color: #ef4444; color: #fef3c7; }
+
+    /* Warrior SVGs inside the scoreboard */
+    svg.warrior { display: inline-block; transition: opacity 0.4s; }
+  </style>
+</head>
+<body>
+
+<!-- Stars background (shared) -->
+<div id="stars-container"></div>
+
+<!-- ══════════════════════════════════════════ -->
+<!--                START SCREEN               -->
+<!-- ══════════════════════════════════════════ -->
+<div id="screen-start" class="screen active">
+  <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;padding:2rem 1rem;">
+    <!-- Banner -->
+    <div class="banner-pole"></div>
+    <div class="banner-flag">
+      <div class="subtitle">Captain of the</div>
+      <div class="title">Nephite Host</div>
+    </div>
+    <div class="banner-pole-short"></div>
+
+    <!-- Card -->
+    <div class="start-card">
+      <p class="start-year">~ Year 72, Age of the Judges ~</p>
+      <p class="start-blurb">
+        Only a captain schooled in the holy scriptures can lead us to victory. Raise the Title of Liberty and defend the faith! Lead your soldiers through <strong>3 battles</strong>, each with <strong>3 scripture matchings</strong>.
+      </p>
+
+      <div class="rule-grid">
+        <div class="rule-correct">
+          <div class="rule-icon">✓</div>
+          <div class="rule-label">Correct Match</div>
+          <div class="rule-sub">= Nephite point</div>
+        </div>
+        <div class="rule-divider">|</div>
+        <div class="rule-wrong">
+          <div class="rule-icon">✗</div>
+          <div class="rule-label">Wrong Match</div>
+          <div class="rule-sub">= Lamanite point</div>
+        </div>
+      </div>
+
+      <p class="rule-note">3 correct with no wrong answers = Nephite Victory for that battle</p>
+
+      <label class="start-label" for="captain-name">Your Name, Captain:</label>
+      <input id="captain-name" class="start-input" type="text" placeholder="e.g. Moroni" maxlength="30" />
+
+      <button id="btn-start" class="btn-primary" disabled>⚔ Take Command ⚔</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!--                GAME SCREEN                -->
+<!-- ══════════════════════════════════════════ -->
+<div id="screen-game" class="screen">
+  <!-- Top bar -->
+  <div class="topbar">
+    <span class="topbar-captain" id="topbar-captain">⚔ Captain Moroni</span>
+    <span class="topbar-battle" id="topbar-battle">Battle 1 of 3</span>
+    <div class="war-dots">
+      <div class="dot-group" id="war-dots-n"></div>
+      <span class="dot-vs">vs</span>
+      <div class="dot-group" id="war-dots-l"></div>
+    </div>
+  </div>
+
+  <!-- Scoreboard -->
+  <div class="scoreboard">
+    <div class="score-row">
+      <!-- Nephite side -->
+      <div class="score-side">
+        <div class="warriors" id="warriors-n"></div>
+        <span class="score-num score-num-n-off" id="score-n">0</span>
+      </div>
+      <!-- Middle -->
+      <div class="score-mid">
+        <div class="score-mid-label">Battle</div>
+        <div class="score-mid-vs">vs</div>
+        <div class="score-mid-count" id="match-count">0/3 matched</div>
+      </div>
+      <!-- Lamanite side -->
+      <div class="score-side">
+        <span class="score-num score-num-l-off" id="score-l">0</span>
+        <div class="warriors" id="warriors-l"></div>
+      </div>
+    </div>
+    <div class="score-labels">
+      <span class="label-n">Nephites</span>
+      <span class="label-l">Lamanites</span>
+    </div>
+  </div>
+
+  <div class="hint">Select a scripture → then click its matching reference</div>
+
+  <!-- Card area -->
+  <div class="card-area">
+    <div class="card-col">
+      <div class="col-header">Scripture</div>
+      <div id="scripture-cards"></div>
+    </div>
+    <div class="card-col">
+      <div class="col-header">Reference</div>
+      <div id="reference-cards"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!--               ROUND POPUP                 -->
+<!-- ══════════════════════════════════════════ -->
+<div id="popup-overlay">
+  <div class="popup-box" id="popup-box">
+    <div class="popup-emoji" id="popup-emoji"></div>
+    <div class="popup-title" id="popup-title"></div>
+    <div class="popup-round" id="popup-round"></div>
+    <div class="popup-scores">
+      <div class="popup-score-n">
+        <div class="ps-label-n">Nephites</div>
+        <div class="ps-num" id="popup-n">0</div>
+        <div class="ps-sub-n">correct</div>
+      </div>
+      <div class="ps-vs">vs</div>
+      <div class="popup-score-l">
+        <div class="ps-label-l">Lamanites</div>
+        <div class="ps-num" id="popup-l">0</div>
+        <div class="ps-sub-l">wrong answers</div>
+      </div>
+    </div>
+    <div class="popup-msg" id="popup-msg"></div>
+    <button class="btn-popup" id="btn-continue"></button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!--               FINAL SCREEN                -->
+<!-- ══════════════════════════════════════════ -->
+<div id="screen-final" class="screen">
+  <div class="final-emoji" id="final-emoji"></div>
+  <div class="final-title" id="final-title"></div>
+  <div class="final-subtitle" id="final-subtitle"></div>
+  <div class="final-captain" id="final-captain"></div>
+
+  <div class="final-card" id="final-card">
+    <div class="final-card-title">War Record — 3 Battles</div>
+    <div class="final-scores">
+      <div class="fs-n">
+        <div class="fs-label-n">Nephite Victories</div>
+        <div class="fs-num" id="final-n-num">0</div>
+        <div class="fs-dots" id="final-n-dots"></div>
+      </div>
+      <div class="fs-vs">vs</div>
+      <div class="fs-l">
+        <div class="fs-label-l">Lamanite Victories</div>
+        <div class="fs-num" id="final-l-num">0</div>
+        <div class="fs-dots" id="final-l-dots"></div>
+      </div>
+    </div>
+    <div class="final-breakdown" id="final-breakdown"></div>
+  </div>
+
+  <button class="btn-play-again" id="btn-play-again">Play Again</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════
+const ALL_SCRIPTURES = [
+  { reference: "Moses 1:39", text: "This is my work and my glory—to bring to pass the immortality and eternal life of man." },
+  { reference: "Moses 7:18", text: "The Lord called his people Zion, because they were of one heart and one mind." },
+  { reference: "Abraham 2:9\u201311", text: "Bear this ministry and Priesthood unto all nations." },
+  { reference: "Abraham 3:22\u201323", text: "We were organized before the world was." },
+  { reference: "Genesis 1:26\u201327", text: "God created man in his own image." },
+  { reference: "Genesis 2:24", text: "Shall cleave unto his wife: and they shall be one." },
+  { reference: "Genesis 39:9", text: "How then can I do this great wickedness, and sin against God?" },
+  { reference: "Exodus 20:3\u201317", text: "The Ten Commandments." },
+  { reference: "Joshua 24:15", text: "Choose you this day whom ye will serve." },
+  { reference: "Psalm 24:3\u20134", text: "Who shall stand in his holy place? He that hath clean hands, and a pure heart." },
+  { reference: "Proverbs 3:5\u20136", text: "Trust in the Lord with all thine heart \u2026 and he shall direct thy paths." },
+  { reference: "Isaiah 1:18", text: "Though your sins be as scarlet, they shall be as white as snow." },
+  { reference: "Isaiah 5:20", text: "Woe unto them that call evil good, and good evil." },
+  { reference: "Isaiah 29:13\u201314", text: "A marvellous work and a wonder." },
+  { reference: "Isaiah 53:3\u20135", text: "Surely he hath borne our griefs, and carried our sorrows." },
+  { reference: "Isaiah 58:6\u20137", text: "The blessings of a proper fast." },
+  { reference: "Isaiah 58:13\u201314", text: "Call the sabbath a delight." },
+  { reference: "Jeremiah 1:4\u20135", text: "Before I formed thee in the belly \u2026 I ordained thee a prophet." },
+  { reference: "Ezekiel 3:16\u201317", text: "A watchman unto the house of Israel." },
+  { reference: "Ezekiel 37:15\u201317", text: "Shall become one in thine hand. (Bible and Book of Mormon)" },
+  { reference: "Daniel 2:44\u201345", text: "A kingdom, which shall never be destroyed." },
+  { reference: "Amos 3:7", text: "The Lord God \u2026 revealeth his secret unto his servants the prophets." },
+  { reference: "Malachi 3:8\u201310", text: "The blessings of paying tithing." },
+  { reference: "Malachi 4:5\u20136", text: "Turn \u2026 the heart of the children to their fathers." },
+  { reference: "Matthew 5:14\u201316", text: "Let your light so shine before men." },
+  { reference: "Matthew 11:28\u201330", text: "Come unto me \u2026 and I will give you rest." },
+  { reference: "Matthew 16:15\u201319", text: "I will give unto thee the keys of the kingdom." },
+  { reference: "Matthew 22:36\u201339", text: "Thou shalt love the Lord thy God \u2026 Thou shalt love thy neighbour." },
+  { reference: "Luke 2:10\u201312", text: "Unto you is born this day \u2026 a Saviour, which is Christ the Lord." },
+  { reference: "Luke 22:19\u201320", text: "In remembrance of me. (sacrament)" },
+  { reference: "Luke 24:36\u201339", text: "A spirit hath not flesh and bones, as ye see me have." },
+  { reference: "John 3:5", text: "Born of water and of the Spirit." },
+  { reference: "John 3:16", text: "God so loved the world, that he gave his only begotten Son." },
+  { reference: "John 7:17", text: "If any man will do his will, he shall know of the doctrine." },
+  { reference: "John 17:3", text: "This is life eternal, that they might know thee the only true God." },
+  { reference: "1 Corinthians 6:19\u201320", text: "Your body is the temple of the Holy Ghost." },
+  { reference: "1 Corinthians 11:11", text: "Neither is the man without the woman \u2026 in the Lord." },
+  { reference: "1 Corinthians 15:20\u201322", text: "As in Adam all die, even so in Christ shall all be made alive." },
+  { reference: "1 Corinthians 15:40\u201342", text: "Three degrees of glory." },
+  { reference: "Ephesians 1:10", text: "Dispensation of the fulness of times." },
+  { reference: "Ephesians 2:19\u201320", text: "Built upon the foundation of the apostles and prophets." },
+  { reference: "2 Thessalonians 2:1\u20133", text: "There come a falling away first." },
+  { reference: "2 Timothy 3:15\u201317", text: "The holy scriptures \u2026 able to make thee wise unto salvation." },
+  { reference: "Hebrews 12:9", text: "The Father of spirits." },
+  { reference: "James 1:5\u20136", text: "If any of you lack wisdom, let him ask of God." },
+  { reference: "James 2:17\u201318", text: "Faith, if it hath not works, is dead." },
+  { reference: "1 Peter 4:6", text: "The gospel preached also to them that are dead." },
+  { reference: "Revelation 20:12", text: "The dead were judged \u2026 according to their works." },
+  { reference: "1 Nephi 3:7", text: "I will go and do the things which the Lord hath commanded." },
+  { reference: "2 Nephi 2:25", text: "Adam fell that men might be; and men are, that they might have joy." },
+  { reference: "2 Nephi 2:27", text: "Free to choose liberty and eternal life." },
+  { reference: "2 Nephi 26:33", text: "All are alike unto God." },
+  { reference: "2 Nephi 28:30", text: "Line upon line, precept upon precept." },
+  { reference: "2 Nephi 32:3", text: "Feast upon the words of Christ." },
+  { reference: "2 Nephi 32:8\u20139", text: "Ye must pray always." },
+  { reference: "Mosiah 2:17", text: "When ye are in the service of your fellow beings ye are only in the service of your God." },
+  { reference: "Mosiah 2:41", text: "Those that keep the commandments \u2026 are blessed in all things." },
+  { reference: "Mosiah 3:19", text: "Put off the natural man \u2026 through the atonement of Christ." },
+  { reference: "Mosiah 4:9", text: "Believe in God \u2026 believe that he has all wisdom." },
+  { reference: "Mosiah 18:8\u201310", text: "Baptized \u2026 as a witness \u2026 that ye have entered into a covenant." },
+  { reference: "Alma 7:11\u201313", text: "Suffering pains and afflictions and temptations of every kind." },
+  { reference: "Alma 34:9\u201310", text: "An infinite and eternal sacrifice." },
+  { reference: "Alma 39:9", text: "Go no more after the lusts of your eyes." },
+  { reference: "Alma 41:10", text: "Wickedness never was happiness." },
+  { reference: "Helaman 5:12", text: "Upon the rock of our Redeemer \u2026 build your foundation." },
+  { reference: "3 Nephi 11:10\u201311", text: "I have suffered the will of the Father in all things." },
+  { reference: "3 Nephi 12:48", text: "Be perfect even as I, or your Father who is in heaven is perfect." },
+  { reference: "3 Nephi 27:20", text: "Baptized \u2026 sanctified by the reception of the Holy Ghost." },
+  { reference: "Ether 12:6", text: "Ye receive no witness until after the trial of your faith." },
+  { reference: "Ether 12:27", text: "Weak things become strong." },
+  { reference: "Moroni 7:45\u201348", text: "Charity is the pure love of Christ." },
+  { reference: "Moroni 10:4\u20135", text: "Ask with a sincere heart \u2026 by the power of the Holy Ghost ye may know the truth." },
+  { reference: "Joseph Smith\u2014History 1:15\u201320", text: "Saw two Personages, whose brightness and glory defy all description." },
+  { reference: "D&C 1:30", text: "The only true and living church." },
+  { reference: "D&C 1:37\u201338", text: "Whether by mine own voice or by the voice of my servants, it is the same." },
+  { reference: "D&C 6:36", text: "Look unto me in every thought; doubt not, fear not." },
+  { reference: "D&C 8:2\u20133", text: "I will tell you in your mind and in your heart, by the Holy Ghost." },
+  { reference: "D&C 13:1", text: "Keys of the ministering of angels \u2026 and of baptism." },
+  { reference: "D&C 18:10\u201311", text: "The worth of souls is great in the sight of God." },
+  { reference: "D&C 18:15\u201316", text: "How great will be your joy if you should bring many souls unto me!" },
+  { reference: "D&C 19:16\u201319", text: "I, Jesus Christ, have suffered these things for all." },
+  { reference: "D&C 21:4\u20136", text: "His word ye shall receive, as if from mine own mouth." },
+  { reference: "D&C 29:10\u201311", text: "I will reveal myself from heaven \u2026 dwell in righteousness \u2026 a thousand years." },
+  { reference: "D&C 49:15\u201317", text: "Marriage is ordained of God." },
+  { reference: "D&C 58:42\u201343", text: "He who has repented \u2026 the same is forgiven." },
+  { reference: "D&C 64:9\u201311", text: "Of you it is required to forgive all men." },
+  { reference: "D&C 76:22\u201324", text: "By him the worlds are and were created." },
+  { reference: "D&C 82:10", text: "I, the Lord, am bound when ye do what I say." },
+  { reference: "D&C 84:20\u201322", text: "In the ordinances thereof, the power of godliness is manifest." },
+  { reference: "D&C 88:118", text: "Seek learning, even by study and also by faith." },
+  { reference: "D&C 89:18\u201321", text: "The blessings of the Word of Wisdom." },
+  { reference: "D&C 107:8", text: "Melchizedek Priesthood \u2026 power and authority \u2026 in spiritual things." },
+  { reference: "D&C 121:36, 41\u201342", text: "Rights of the priesthood \u2026 only on the principles of righteousness." },
+  { reference: "D&C 130:22\u201323", text: "The Father has a body of flesh and bones \u2026 the Holy Ghost is a personage of Spirit." },
+  { reference: "D&C 131:1\u20134", text: "The new and everlasting covenant of marriage." },
+  { reference: "D&C 135:3", text: "Joseph Smith \u2026 brought forth the Book of Mormon \u2026 by the gift and power of God." },
+];
+
+const ROUND_SIZE = 3;
+const TOTAL_ROUNDS = 3;
+
+// ═══════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function nephiteSVG(active) {
+  const op = active ? '1' : '0.2';
+  return `<svg class="warrior" width="28" height="40" viewBox="0 0 32 44" fill="none" style="opacity:${op}">
+    <circle cx="16" cy="7" r="5.5" fill="#c8a84b" stroke="#8B6914" stroke-width="1"/>
+    <path d="M13 2.5 Q16 -1 19 2.5" stroke="#4a9e4a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <rect x="10" y="13" width="12" height="13" rx="2" fill="#4a9e4a" stroke="#2d6b2d" stroke-width="1"/>
+    <rect x="10" y="25" width="5" height="11" rx="1" fill="#2d6b2d"/>
+    <rect x="17" y="25" width="5" height="11" rx="1" fill="#2d6b2d"/>
+    <rect x="3" y="13" width="7" height="4" rx="1" fill="#4a9e4a"/>
+    <rect x="22" y="13" width="7" height="4" rx="1" fill="#4a9e4a"/>
+    <rect x="26" y="8" width="2" height="14" rx="1" fill="#8B6914"/>
+    <polygon points="26,8 27,4 28,8" fill="#d4d4d4"/>
+    <circle cx="14.5" cy="7" r="0.9" fill="#5a3a00"/>
+    <circle cx="17.5" cy="7" r="0.9" fill="#5a3a00"/>
+  </svg>`;
+}
+
+function lamaniteSVG(active) {
+  const op = active ? '1' : '0.2';
+  return `<svg class="warrior" width="28" height="40" viewBox="0 0 32 44" fill="none" style="opacity:${op}">
+    <circle cx="16" cy="7" r="5.5" fill="#8B3A3A" stroke="#5a1a1a" stroke-width="1"/>
+    <path d="M13 2.5 Q16 -2 19 2.5" stroke="#cc2222" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <rect x="10" y="13" width="12" height="13" rx="2" fill="#7a2020" stroke="#5a1010" stroke-width="1"/>
+    <rect x="10" y="25" width="5" height="11" rx="1" fill="#5a1010"/>
+    <rect x="17" y="25" width="5" height="11" rx="1" fill="#5a1010"/>
+    <rect x="3" y="13" width="7" height="4" rx="1" fill="#7a2020"/>
+    <rect x="22" y="13" width="7" height="4" rx="1" fill="#7a2020"/>
+    <rect x="3" y="8" width="2" height="14" rx="1" fill="#8B6914"/>
+    <polygon points="3,8 4,3 5,8" fill="#d4d4d4"/>
+    <circle cx="14.5" cy="7" r="0.9" fill="#200"/>
+    <circle cx="17.5" cy="7" r="0.9" fill="#200"/>
+  </svg>`;
+}
+
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let captainName   = 'Moroni';
+let round         = 1;
+let usedIndices   = [];
+let roundNephite  = 0;
+let roundLamanite = 0;
+let warNephite    = 0;
+let warLamanite   = 0;
+let roundHistory  = [];
+
+let roundScriptures = [];  // [{reference, text}, ...]
+let shuffledRefs    = [];  // [{reference, text}, ...]
+let matchedScripts  = new Set();  // indices into roundScriptures
+let matchedRefs     = new Set();  // references (strings) already matched
+let selectedScript  = null;       // index, or null
+let flashing        = false;
+
+// ═══════════════════════════════════════════════════
+//  STARS
+// ═══════════════════════════════════════════════════
+(function buildStars() {
+  const container = document.getElementById('stars-container');
+  for (let i = 0; i < 60; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2 + 1;
+    s.style.cssText = `width:${size}px;height:${size}px;top:${Math.random()*65}%;left:${Math.random()*100}%;opacity:${(Math.random()*0.6+0.2).toFixed(2)}`;
+    container.appendChild(s);
+  }
+})();
+
+// ═══════════════════════════════════════════════════
+//  SCREEN MANAGEMENT
+// ═══════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════
+//  START SCREEN
+// ═══════════════════════════════════════════════════
+const nameInput = document.getElementById('captain-name');
+const btnStart  = document.getElementById('btn-start');
+
+nameInput.addEventListener('input', () => {
+  btnStart.disabled = nameInput.value.trim() === '';
+});
+nameInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && nameInput.value.trim()) startGame();
+});
+btnStart.addEventListener('click', startGame);
+
+function startGame() {
+  captainName   = nameInput.value.trim() || 'Moroni';
+  round         = 1;
+  usedIndices   = [];
+  roundNephite  = 0;
+  roundLamanite = 0;
+  warNephite    = 0;
+  warLamanite   = 0;
+  roundHistory  = [];
+  showScreen('game');
+  dealRound();
+}
+
+// ═══════════════════════════════════════════════════
+//  DEAL ROUND
+// ═══════════════════════════════════════════════════
+function dealRound() {
+  let pool = ALL_SCRIPTURES.map((_, i) => i).filter(i => !usedIndices.includes(i));
+  if (pool.length < ROUND_SIZE) pool = ALL_SCRIPTURES.map((_, i) => i);
+  const chosen = shuffle(pool).slice(0, ROUND_SIZE);
+  usedIndices.push(...chosen);
+
+  roundScriptures = chosen.map(i => ALL_SCRIPTURES[i]);
+  shuffledRefs    = shuffle([...roundScriptures]);
+  matchedScripts  = new Set();
+  matchedRefs     = new Set();
+  selectedScript  = null;
+  flashing        = false;
+  roundNephite    = 0;
+  roundLamanite   = 0;
+
+  renderTopBar();
+  renderScoreboard();
+  renderCards();
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER TOP BAR
+// ═══════════════════════════════════════════════════
+function renderTopBar() {
+  document.getElementById('topbar-captain').textContent = '⚔ Captain ' + captainName;
+  document.getElementById('topbar-battle').textContent  = 'Battle ' + round + ' of ' + TOTAL_ROUNDS;
+
+  const dotsN = document.getElementById('war-dots-n');
+  const dotsL = document.getElementById('war-dots-l');
+  dotsN.innerHTML = '';
+  dotsL.innerHTML = '';
+
+  for (let i = 0; i < TOTAL_ROUNDS; i++) {
+    const dn = document.createElement('div');
+    dn.className = 'dot ' + (i < warNephite ? 'dot-n-on' : 'dot-n-off');
+    dn.textContent = 'N';
+    dotsN.appendChild(dn);
+
+    const dl = document.createElement('div');
+    dl.className = 'dot ' + (i < warLamanite ? 'dot-l-on' : 'dot-l-off');
+    dl.textContent = 'L';
+    dotsL.appendChild(dl);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER SCOREBOARD
+// ═══════════════════════════════════════════════════
+function renderScoreboard() {
+  const sn = document.getElementById('score-n');
+  sn.textContent = roundNephite;
+  sn.className = 'score-num ' + (roundNephite > 0 ? 'score-num-n-on' : 'score-num-n-off');
+
+  const sl = document.getElementById('score-l');
+  sl.textContent = roundLamanite;
+  sl.className = 'score-num ' + (roundLamanite > 0 ? 'score-num-l-on' : 'score-num-l-off');
+
+  document.getElementById('match-count').textContent = matchedScripts.size + '/' + ROUND_SIZE + ' matched';
+
+  const wn = document.getElementById('warriors-n');
+  const wl = document.getElementById('warriors-l');
+  wn.innerHTML = '';
+  wl.innerHTML = '';
+  for (let i = 0; i < ROUND_SIZE; i++) {
+    wn.innerHTML += nephiteSVG(i < roundNephite);
+    wl.innerHTML += lamaniteSVG(i < roundLamanite);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER CARDS
+// ═══════════════════════════════════════════════════
+function renderCards() {
+  const scriptureCol = document.getElementById('scripture-cards');
+  const refCol       = document.getElementById('reference-cards');
+  scriptureCol.innerHTML = '';
+  refCol.innerHTML = '';
+
+  // Scripture cards
+  roundScriptures.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'card card-idle-script';
+    btn.style.minHeight = '90px';
+    btn.style.transition = 'all 0.25s';
+    btn.style.display = 'block';
+    btn.style.width = '100%';
+    btn.style.marginBottom = '0.6rem';
+    btn.textContent = s.text;
+    btn.dataset.idx = i;
+    btn.addEventListener('click', () => onScriptureClick(i));
+    scriptureCol.appendChild(btn);
+  });
+
+  // Reference cards
+  shuffledRefs.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'card card-ref card-idle-ref';
+    btn.style.minHeight = '90px';
+    btn.style.transition = 'all 0.25s';
+    btn.style.display = 'block';
+    btn.style.width = '100%';
+    btn.style.marginBottom = '0.6rem';
+    btn.textContent = s.reference;
+    btn.dataset.refIdx = i;
+    btn.addEventListener('click', () => onRefClick(i));
+    refCol.appendChild(btn);
+  });
+}
+
+function getScriptureCard(i) {
+  return document.querySelector(`#scripture-cards button[data-idx="${i}"]`);
+}
+function getRefCard(i) {
+  return document.querySelector(`#reference-cards button[data-ref-idx="${i}"]`);
+}
+
+// ═══════════════════════════════════════════════════
+//  UPDATE CARD STATES
+// ═══════════════════════════════════════════════════
+function refreshCardStates(flashInfo) {
+  // Scripture cards
+  roundScriptures.forEach((_, i) => {
+    const btn = getScriptureCard(i);
+    if (!btn) return;
+    btn.className = 'card '; // reset
+
+    if (matchedScripts.has(i)) {
+      btn.className += 'card-matched';
+      btn.style.opacity = '0';
+      btn.style.pointerEvents = 'none';
+    } else if (flashInfo && flashInfo.type === 'correct' && flashInfo.scriptIdx === i) {
+      btn.className += 'card-correct';
+    } else if (flashInfo && flashInfo.type === 'wrong' && flashInfo.scriptIdx === i) {
+      btn.className += 'card-wrong';
+    } else if (selectedScript === i) {
+      btn.className += 'card-selected';
+    } else {
+      btn.className += 'card-idle-script';
+    }
+  });
+
+  // Reference cards
+  shuffledRefs.forEach((s, i) => {
+    const btn = getRefCard(i);
+    if (!btn) return;
+    btn.className = 'card card-ref ';
+
+    if (matchedRefs.has(s.reference)) {
+      btn.className += 'card-matched';
+      btn.style.opacity = '0';
+      btn.style.pointerEvents = 'none';
+    } else if (flashInfo && flashInfo.type === 'correct' && flashInfo.refIdx === i) {
+      btn.className += 'card-correct';
+    } else if (flashInfo && flashInfo.type === 'wrong' && flashInfo.refIdx === i) {
+      btn.className += 'card-wrong';
+    } else if (selectedScript !== null && !matchedRefs.has(s.reference)) {
+      btn.className += 'card-active-ref';
+    } else {
+      btn.className += 'card-idle-ref';
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  INTERACTION
+// ═══════════════════════════════════════════════════
+function onScriptureClick(i) {
+  if (matchedScripts.has(i) || flashing) return;
+  selectedScript = i;
+  refreshCardStates(null);
+}
+
+function onRefClick(refIdx) {
+  if (selectedScript === null || flashing) return;
+  const isCorrect = roundScriptures[selectedScript].reference === shuffledRefs[refIdx].reference;
+  const scriptIdx = selectedScript;
+  flashing = true;
+
+  if (isCorrect) {
+    roundNephite++;
+    renderScoreboard();
+    refreshCardStates({ type: 'correct', scriptIdx, refIdx });
+
+    setTimeout(() => {
+      matchedScripts.add(scriptIdx);
+      matchedRefs.add(shuffledRefs[refIdx].reference);
+      selectedScript = null;
+      flashing = false;
+      refreshCardStates(null);
+      renderScoreboard();
+      checkRoundComplete();
+    }, 500);
+
+  } else {
+    roundLamanite++;
+    renderScoreboard();
+    refreshCardStates({ type: 'wrong', scriptIdx, refIdx });
+
+    setTimeout(() => {
+      selectedScript = null;
+      flashing = false;
+      refreshCardStates(null);
+    }, 700);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  ROUND COMPLETE
+// ═══════════════════════════════════════════════════
+function checkRoundComplete() {
+  if (matchedScripts.size < ROUND_SIZE) return;
+
+  setTimeout(() => {
+    showRoundPopup();
+  }, 300);
+}
+
+// ═══════════════════════════════════════════════════
+//  POPUP
+// ═══════════════════════════════════════════════════
+function showRoundPopup() {
+  const nephiteWon = roundLamanite === 0;
+  const overlay = document.getElementById('popup-overlay');
+  const box     = document.getElementById('popup-box');
+
+  box.className = 'popup-box ' + (nephiteWon ? 'nephite' : 'lamanite');
+  document.getElementById('popup-emoji').textContent = nephiteWon ? '⚔️🏆' : '💀';
+
+  const titleEl = document.getElementById('popup-title');
+  titleEl.className = 'popup-title ' + (nephiteWon ? 'nephite' : 'lamanite');
+  titleEl.textContent = nephiteWon ? 'Nephite Victory!' : 'Lamanite Victory!';
+
+  document.getElementById('popup-round').textContent = 'Battle ' + round + ' Complete';
+  document.getElementById('popup-n').textContent = roundNephite;
+  document.getElementById('popup-l').textContent = roundLamanite;
+
+  const msgEl = document.getElementById('popup-msg');
+  msgEl.className = 'popup-msg ' + (nephiteWon ? 'nephite' : 'lamanite');
+  msgEl.textContent = nephiteWon
+    ? 'All scriptures matched! The Nephites hold the city!'
+    : roundLamanite + ' wrong answer' + (roundLamanite > 1 ? 's' : '') + ' — the Lamanites advanced.';
+
+  const isFinal = round >= TOTAL_ROUNDS;
+  const btn = document.getElementById('btn-continue');
+  btn.className = 'btn-popup ' + (nephiteWon ? 'nephite' : 'lamanite');
+  btn.textContent = isFinal ? 'See War Results →' : 'Next Battle →';
+
+  overlay.classList.add('open');
+}
+
+document.getElementById('btn-continue').addEventListener('click', () => {
+  const nephiteWon = roundLamanite === 0;
+  warNephite  += nephiteWon ? 1 : 0;
+  warLamanite += nephiteWon ? 0 : 1;
+  roundHistory.push({ nephite: roundNephite, lamanite: roundLamanite });
+
+  document.getElementById('popup-overlay').classList.remove('open');
+
+  if (round >= TOTAL_ROUNDS) {
+    showFinalScreen();
+  } else {
+    round++;
+    renderTopBar();
+    dealRound();
+  }
+});
+
+// ═══════════════════════════════════════════════════
+//  FINAL SCREEN
+// ═══════════════════════════════════════════════════
+function showFinalScreen() {
+  const win = warNephite > warLamanite;
+
+  const finalScreen = document.getElementById('screen-final');
+  finalScreen.className = 'screen ' + (win ? 'win' : 'lose');
+
+  document.getElementById('final-emoji').textContent    = win ? '🏆' : '💀';
+  const titleEl = document.getElementById('final-title');
+  titleEl.className = 'final-title ' + (win ? 'win' : 'lose');
+  titleEl.textContent = win ? 'The War is Won!' : 'The War is Lost';
+
+  const subEl = document.getElementById('final-subtitle');
+  subEl.className = 'final-subtitle ' + (win ? 'win' : 'lose');
+  subEl.textContent = win
+    ? 'The Title of Liberty waves over Zarahemla!'
+    : 'The city has fallen\u2026 Study and try again, captain.';
+
+  document.getElementById('final-captain').textContent = 'Captain ' + captainName;
+
+  const card = document.getElementById('final-card');
+  card.className = 'final-card ' + (win ? 'win' : 'lose');
+
+  document.getElementById('final-n-num').textContent = warNephite;
+  document.getElementById('final-l-num').textContent = warLamanite;
+
+  // Dots
+  const nDots = document.getElementById('final-n-dots');
+  const lDots = document.getElementById('final-l-dots');
+  nDots.innerHTML = '';
+  lDots.innerHTML = '';
+  for (let i = 0; i < TOTAL_ROUNDS; i++) {
+    const dn = document.createElement('div');
+    dn.className = 'fs-dot ' + (i < warNephite ? 'fs-dot-n-on' : 'fs-dot-n-off');
+    nDots.appendChild(dn);
+    const dl = document.createElement('div');
+    dl.className = 'fs-dot ' + (i < warLamanite ? 'fs-dot-l-on' : 'fs-dot-l-off');
+    lDots.appendChild(dl);
+  }
+
+  // Breakdown
+  const bd = document.getElementById('final-breakdown');
+  bd.innerHTML = '';
+  roundHistory.forEach((r, i) => {
+    const row = document.createElement('div');
+    row.className = 'breakdown-row';
+    const lbl = document.createElement('span');
+    lbl.className = 'br-label';
+    lbl.textContent = 'Battle ' + (i + 1);
+    const res = document.createElement('span');
+    res.className = r.lamanite === 0 ? 'br-result-n' : 'br-result-l';
+    res.textContent = r.lamanite === 0 ? '\u2694 Nephite Victory' : '\uD83D\uDC80 Lamanite Victory';
+    const stats = document.createElement('span');
+    stats.className = 'br-stats';
+    stats.textContent = r.nephite + ' correct / ' + r.lamanite + ' wrong';
+    row.appendChild(lbl);
+    row.appendChild(res);
+    row.appendChild(stats);
+    bd.appendChild(row);
+  });
+
+  const playBtn = document.getElementById('btn-play-again');
+  playBtn.className = 'btn-play-again ' + (win ? 'win' : 'lose');
+
+  showScreen('final');
+}
+
+document.getElementById('btn-play-again').addEventListener('click', () => {
+  showScreen('start');
+  nameInput.value = '';
+  btnStart.disabled = true;
+});
+</script>
+</body>
+</html>

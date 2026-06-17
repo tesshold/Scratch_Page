@@ -1,0 +1,406 @@
+<!--NOTE: This information is made up! I didn't want to put in my actual info-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tess' Resume</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:      #1a1a1a;
+      --dark-grey:  #3d3d3d;
+      --mid-grey:   #7a7a7a;
+      --light-grey: #d4d4d4;
+      --blush:      #fce8e8;
+      --blush-dark: #e8c8c8;
+      --page-bg:    #f7f7f7;
+      --white:      #ffffff;
+    }
+
+    body {
+      background: var(--page-bg);
+      font-family: 'Inter', sans-serif;
+      color: var(--dark-grey);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+
+    .resume {
+      background: var(--white);
+      max-width: 760px;
+      width: 100%;
+      padding: 64px 72px;
+      box-shadow: 0 2px 40px rgba(0,0,0,0.07);
+    }
+
+    /* ── HEADER ── */
+    .header {
+      border-bottom: 1px solid var(--light-grey);
+      padding-bottom: 36px;
+      margin-bottom: 48px;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 56px;
+      letter-spacing: 0.02em;
+      color: var(--black);
+      line-height: 1;
+    }
+
+    .title-tag {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--mid-grey);
+      background: var(--blush);
+      padding: 6px 14px;
+      border-radius: 2px;
+      white-space: nowrap;
+      align-self: center;
+    }
+
+    .contact-row {
+      margin-top: 18px;
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+
+    .contact-item {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--mid-grey);
+      letter-spacing: 0.04em;
+    }
+
+    .contact-item a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid var(--blush-dark);
+      padding-bottom: 1px;
+      transition: color 0.2s;
+    }
+
+    .contact-item a:hover { color: var(--dark-grey); }
+
+    /* ── SECTIONS ── */
+    section {
+      margin-bottom: 48px;
+    }
+
+    .section-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--mid-grey);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 2px;
+      background: var(--blush-dark);
+      flex-shrink: 0;
+    }
+
+    /* ── ABOUT ── */
+    .about-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--black);
+      max-width: 580px;
+    }
+
+    /* ── EXPERIENCE ── */
+    .experience-list {
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+    }
+
+    .job {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 0 32px;
+    }
+
+    .job-meta {
+      padding-top: 2px;
+    }
+
+    .job-date {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--mid-grey);
+      letter-spacing: 0.04em;
+      line-height: 1.5;
+    }
+
+    .job-company {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--mid-grey);
+      margin-top: 4px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .job-body {}
+
+    .job-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--black);
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+
+    .job-desc {
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--dark-grey);
+      line-height: 1.75;
+    }
+
+    .job-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .tag {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--mid-grey);
+      border: 1px solid var(--light-grey);
+      padding: 3px 10px;
+      border-radius: 2px;
+    }
+
+    /* ── SKILLS ── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px 16px;
+    }
+
+    .skill-group {}
+
+    .skill-group-name {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--black);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--blush-dark);
+    }
+
+    .skill-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .skill-list li {
+      font-size: 12.5px;
+      font-weight: 300;
+      color: var(--dark-grey);
+      line-height: 1.4;
+    }
+
+    /* ── FOOTER ── */
+    .resume-footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--blush-dark);
+      text-align: right;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--light-grey);
+    }
+
+    @media (max-width: 600px) {
+      .resume { padding: 40px 28px; }
+      .name { font-size: 40px; }
+      .job { grid-template-columns: 1fr; gap: 6px; }
+      .skills-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .resume { box-shadow: none; padding: 40px 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="resume">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-top">
+        <h1 class="name">Tess</h1>
+        <span class="title-tag">Available for Work</span>
+      </div>
+      <div class="contact-row">
+        <span class="contact-item"><a href="mailto:tess@email.com">tess@email.com</a></span>
+        <span class="contact-item"><a href="tel:+15550000000">+1 (555) 000-0000</a></span>
+        <span class="contact-item"><a href="#">linkedin.com/in/tess</a></span>
+        <span class="contact-item">New York, NY</span>
+      </div>
+    </header>
+
+    <!-- ABOUT -->
+    <section id="about">
+      <div class="section-label">About</div>
+      <p class="about-text">
+        A detail-oriented creative professional with a passion for thoughtful design and clear communication.
+        I bring calm clarity to complex problems and thrive in collaborative environments where craft and intention are equally valued.
+      </p>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section id="experience">
+      <div class="section-label">Experience</div>
+      <div class="experience-list">
+
+        <div class="job">
+          <div class="job-meta">
+            <div class="job-date">2022 — Present</div>
+            <div class="job-company">Studio Forma</div>
+          </div>
+          <div class="job-body">
+            <div class="job-title">Senior Brand Designer</div>
+            <p class="job-desc">
+              Led visual identity work for a portfolio of 12+ clients across fashion, hospitality, and tech.
+              Managed creative direction from discovery through delivery, collaborating closely with strategy and copy teams to ensure cohesion at every touchpoint.
+            </p>
+            <div class="job-tags">
+              <span class="tag">Brand Identity</span>
+              <span class="tag">Art Direction</span>
+              <span class="tag">Team Lead</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="job">
+          <div class="job-meta">
+            <div class="job-date">2019 — 2022</div>
+            <div class="job-company">Halcyon Agency</div>
+          </div>
+          <div class="job-body">
+            <div class="job-title">Visual Designer</div>
+            <p class="job-desc">
+              Developed campaign assets, digital interfaces, and editorial layouts for mid-market and enterprise clients.
+              Introduced a new component library that reduced production time by 30% across the design team.
+            </p>
+            <div class="job-tags">
+              <span class="tag">UI Design</span>
+              <span class="tag">Design Systems</span>
+              <span class="tag">Editorial</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="job">
+          <div class="job-meta">
+            <div class="job-date">2017 — 2019</div>
+            <div class="job-company">Freelance</div>
+          </div>
+          <div class="job-body">
+            <div class="job-title">Independent Designer</div>
+            <p class="job-desc">
+              Worked with early-stage startups and independent makers on brand foundations, packaging design, and web presence.
+              Built lasting client relationships through responsive communication and reliable execution.
+            </p>
+            <div class="job-tags">
+              <span class="tag">Packaging</span>
+              <span class="tag">Web</span>
+              <span class="tag">Startups</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills">
+      <div class="section-label">Skills</div>
+      <div class="skills-grid">
+
+        <div class="skill-group">
+          <div class="skill-group-name">Design</div>
+          <ul class="skill-list">
+            <li>Brand Identity</li>
+            <li>Typography</li>
+            <li>Art Direction</li>
+            <li>Packaging Design</li>
+            <li>Editorial Layout</li>
+          </ul>
+        </div>
+
+        <div class="skill-group">
+          <div class="skill-group-name">Digital</div>
+          <ul class="skill-list">
+            <li>UI / UX Design</li>
+            <li>Design Systems</li>
+            <li>Figma & Sketch</li>
+            <li>Prototyping</li>
+            <li>HTML & CSS</li>
+          </ul>
+        </div>
+
+        <div class="skill-group">
+          <div class="skill-group-name">Soft Skills</div>
+          <ul class="skill-list">
+            <li>Creative Direction</li>
+            <li>Client Communication</li>
+            <li>Project Management</li>
+            <li>Team Mentorship</li>
+            <li>Presentation</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="resume-footer">Tess &mdash; Resume &mdash; 2026</div>
+
+  </div>
+</body>
+</html>
